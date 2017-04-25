@@ -1,6 +1,6 @@
 # UUID to POKéMON
 
-This simple crate allows you to translate an uuid to a pokémon name.
+This simple crate allows you to translate a UUID to a pokémon name.
 
 The purpose is to provide simple names to address objects, so you can easily talk with
 people about the objects.
