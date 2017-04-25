@@ -966,14 +966,11 @@ lazy_static! {
 
 fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
     let bs = uuid.as_bytes().to_vec();
-    println!("bs {:?}", bs);
     let s1 = bs.iter().skip(first_index).take(4);
     let s2 = bs.iter().skip(first_index+4).take(4);
-    let i = s1.zip(s2).fold(0, |acc: usize, (v1,v2)| {
+    s1.zip(s2).fold(0, |acc: usize, (v1,v2)| {
         acc + (*v1 as usize) * (*v2 as usize)
-    });
-    println!("i: {}", i);
-    i
+    })
 }
 
 pub fn uuid_to_pokemon(uuid: Uuid) -> String {

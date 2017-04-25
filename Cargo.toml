@@ -1,6 +1,6 @@
 [package]
 name = "uuid_to_pokemon"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Julien Durillon <julien.durillon@clever-cloud.com"]
 documentation = "https://docs.rs/uuid_to_pokemon"
 description = "Translates a UUID to a qualified pokemon name."
