@@ -982,6 +982,38 @@ pub fn uuid_to_pokemon(uuid: Uuid) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::collections::HashSet;
+
+    fn test_many_times(nb: u32) -> usize {
+        let mut arr = HashSet::new();
+        for _ in 0..nb {
+            arr.insert(uuid_to_pokemon(Uuid::new_v4()));
+        }
+        arr.len()
+    }
+
+    #[test]
+    fn test_uniqueness_level() {
+        assert!(test_many_times(1000) >= 970);
+        assert!(test_many_times(100) >= 98);
+        assert_eq!(test_many_times(10), 10);
+    }
+
+    fn test_no_random(uuid: Uuid) -> bool {
+        let mut set = HashSet::new();
+        for _ in 0..500 {
+            set.insert(uuid_to_pokemon(uuid));
+        }
+        set.len() == 1
+    }
+
+    #[test]
+    fn test_values_are_always_the_same() {
+        assert!(test_no_random(Uuid::new_v4()));
+        assert!(test_no_random(Uuid::new_v4()));
+        assert!(test_no_random(Uuid::new_v4()));
+        assert!(test_no_random(Uuid::new_v4()));
+    }
 
     #[test]
     fn test_uuid_to_pokemon() {
