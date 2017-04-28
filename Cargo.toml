@@ -7,5 +7,4 @@ description = "Translates a UUID to a qualified pokemon name."
 license = "MIT"
 
 [dependencies]
-lazy_static = "0.2"
 uuid = {version = "0.5", features = ["v4"]}
