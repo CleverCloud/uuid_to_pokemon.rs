@@ -6,18 +6,19 @@ use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
 
 fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
-    let bs = uuid.as_bytes().to_vec();
+    let bs = uuid.as_bytes();
     let s1 = bs.iter().skip(first_index).take(4);
     let s2 = bs.iter().skip(first_index+4).take(4);
-    s1.zip(s2).fold(0, |acc: usize, (v1,v2)| {
-        acc + (*v1 as usize) * (*v2 as usize)
-    })
+    s1
+        .zip(s2)
+        .map(|(v1, v2)| (*v1 as usize) * (*v2 as usize))
+        .sum()
 }
 
 pub fn uuid_to_pokemon(uuid: Uuid) -> String {
-    let adj = *ADJECTIVES.iter().nth(get_digit_mult(uuid, 0) % (*ADJECTIVES).len()).expect("Unexpectedly OutOfAdjectives");
-    let pok = *POKEMONS.iter().nth(get_digit_mult(uuid, 8) % (*POKEMONS).len()).expect("Unexpectedly OutOfPokemons");
-    format!("{} {}", adj, pok)
+    let adj_index = get_digit_mult(uuid, 0) % ADJECTIVES.len();
+    let pok_index = get_digit_mult(uuid, 8) % POKEMONS.len();
+    format!("{} {}", ADJECTIVES[adj_index], POKEMONS[pok_index])
 }
 
 #[cfg(test)]
@@ -40,25 +41,24 @@ mod test {
         assert_eq!(test_many_times(10), 10);
     }
 
-    fn test_no_random(uuid: Uuid) -> bool {
+    fn test_no_random(uuid: Uuid) {
         let mut set = HashSet::new();
         for _ in 0..500 {
             set.insert(uuid_to_pokemon(uuid));
         }
-        set.len() == 1
+        assert_eq!(set.len(), 1)
     }
 
     #[test]
     fn test_values_are_always_the_same() {
-        assert!(test_no_random(Uuid::new_v4()));
-        assert!(test_no_random(Uuid::new_v4()));
-        assert!(test_no_random(Uuid::new_v4()));
-        assert!(test_no_random(Uuid::new_v4()));
+        for _ in 0..4 {
+            test_no_random(Uuid::new_v4());
+        }
     }
 
     #[test]
     fn test_uuid_to_pokemon() {
-        let ids = vec![
+        let ids = &[
             "43654e77-0aa4-4551-b545-b0ec6f895f53",
             "ca5da036-8c9e-473d-9392-03be3e928a21",
             "ef822821-83ab-436b-83fc-44feb5d5bf78",
@@ -109,8 +109,9 @@ mod test {
             "7537fc2a-f998-4efa-8f35-8011a9c0f808",
             "9f53d9bf-50a7-4a95-9130-fce9cc478ed3",
             "4aa8e0a4-184a-448c-9f49-2474e251c85a",
-            ];
-        let names = vec![
+        ];
+
+        let names = &[
             "Amusing furret",
             "Great mienshao",
             "Sloppy pidgeotto",
@@ -161,10 +162,10 @@ mod test {
             "Cranky gurdurr",
             "Foul corphish",
             "Crazy shroomish",
-            ];
+        ];
 
         for (u,n) in ids.iter().zip(names.iter()) {
-            assert_eq!(uuid_to_pokemon(Uuid::parse_str(u).unwrap()), n.to_string());
+            assert_eq!(&uuid_to_pokemon(Uuid::parse_str(u).unwrap()), n);
         }
     }
 
