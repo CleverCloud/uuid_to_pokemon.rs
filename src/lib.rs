@@ -8,9 +8,8 @@ use pokemons::{POKEMONS, ADJECTIVES};
 fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
     let bs = uuid.as_bytes();
     let s1 = bs.iter().skip(first_index).take(4);
-    let s2 = bs.iter().skip(first_index+4).take(4);
-    s1
-        .zip(s2)
+    let s2 = bs.iter().skip(first_index + 4).take(4);
+    s1.zip(s2)
         .map(|(v1, v2)| (*v1 as usize) * (*v2 as usize))
         .sum()
 }
@@ -164,7 +163,7 @@ mod test {
             "Crazy shroomish",
         ];
 
-        for (u,n) in ids.iter().zip(names.iter()) {
+        for (u, n) in ids.iter().zip(names.iter()) {
             assert_eq!(&uuid_to_pokemon(Uuid::parse_str(u).unwrap()), n);
         }
     }
