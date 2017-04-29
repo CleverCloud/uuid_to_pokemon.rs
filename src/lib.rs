@@ -6,7 +6,7 @@ use std::fmt;
 use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
 
-#[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, Hash, Eq, Debug)]
 pub struct PokemonUuid<'a> {
     adj: &'a str,
     pok: &'a str,
@@ -20,6 +20,13 @@ impl<'a> PokemonUuid<'a> {
             adj: adj,
             pok: &pok[1..],
         })
+    }
+}
+
+impl<'a, 'b> PartialEq<PokemonUuid<'b>> for PokemonUuid<'a> {
+    #[inline]
+    fn eq(&self, other: &PokemonUuid<'b>) -> bool {
+        self.adj == other.adj && self.pok == other.pok
     }
 }
 
