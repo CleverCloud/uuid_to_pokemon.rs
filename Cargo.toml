@@ -12,3 +12,7 @@ uuid = "0.5"
 
 [dev-dependencies]
 uuid = {version = "0.5", features = ["v4"]}
+
+[badges]
+travis-ci = { repository = "CleverCloud/uuid_to_pokemon.rs" }
+appveyor  = { repository = "Keruspe/uuid_to_pokemon.rs" }
