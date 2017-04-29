@@ -7,15 +7,15 @@ use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
-pub struct PokemonUuid<'a> {
-    adj: &'a str,
-    pok: &'a str,
+pub struct PokemonUuid {
+    adj: &'static str,
+    pok: &'static str,
 }
 
-impl<'a> PokemonUuid<'a> {
+impl PokemonUuid {
     // Can't use FromStr
     // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
-    pub fn parse_str(s: &'a str) -> Result<Self, &'static str> {
+    pub fn parse_str(s: &'static str) -> Result<Self, &'static str> {
         let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
         let (adj, pok) = s.split_at(mid);
         Ok(PokemonUuid {
@@ -25,19 +25,19 @@ impl<'a> PokemonUuid<'a> {
     }
 }
 
-impl<'a> From<Uuid> for PokemonUuid<'a> {
+impl From<Uuid> for PokemonUuid {
     fn from(uuid: Uuid) -> Self {
         uuid_to_pokemon(uuid)
     }
 }
 
-impl<'a> Into<String> for PokemonUuid<'a> {
+impl Into<String> for PokemonUuid {
     fn into(self) -> String {
         format!("{}", self)
     }
 }
 
-impl<'a> fmt::Display for PokemonUuid<'a> {
+impl fmt::Display for PokemonUuid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} {}", self.adj, self.pok)
     }
@@ -52,7 +52,7 @@ fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
         .sum()
 }
 
-pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid<'static> {
+pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid {
     let adj_index = get_digit_mult(uuid, 0) % ADJECTIVES.len();
     let pok_index = get_digit_mult(uuid, 8) % POKEMONS.len();
     PokemonUuid {
