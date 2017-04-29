@@ -8,4 +8,7 @@ description = "Translates a UUID to a qualified pokemon name."
 license = "MIT"
 
 [dependencies]
+uuid = "0.5"
+
+[dev-dependencies]
 uuid = {version = "0.5", features = ["v4"]}
