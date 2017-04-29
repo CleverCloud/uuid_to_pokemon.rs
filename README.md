@@ -5,7 +5,7 @@ This simple crate allows you to translate a UUID to a pokémon name.
 The purpose is to provide simple names to address objects, so you can easily talk with
 people about the objects.
 
-The function is surjective. This means several UUIDs will give the same name. We don't
+The function is not injective. This means several UUIDs will give the same name. We don't
 consider it an issue since context (like owner of object) will help dedup the search.
 
 ## Usage
