@@ -23,6 +23,6 @@ use uuid_to_pokemon::uuid_to_pokemon;
 
 fn main() {
    let u = Uuid::new_v4();
-   println!(uuid_to_pokemon(u)); // e.g. "Careless pidgeotto"
+   println!("{}", uuid_to_pokemon(u)); // e.g. "Careless pidgeotto"
 }
 ```
