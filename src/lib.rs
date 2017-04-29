@@ -31,9 +31,9 @@ impl<'a> From<Uuid> for PokemonUuid<'a> {
     }
 }
 
-impl<'a> Into<String> for PokemonUuid<'a> {
-    fn into(self) -> String {
-        format!("{}", self)
+impl<'a> From<PokemonUuid<'a>> for String {
+    fn from(p: PokemonUuid<'a>) -> String {
+        p.to_string()
     }
 }
 
