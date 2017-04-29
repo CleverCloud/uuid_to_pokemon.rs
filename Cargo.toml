@@ -1,6 +1,6 @@
 [package]
 name = "uuid_to_pokemon"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Julien Durillon <julien.durillon@clever-cloud.com"]
 documentation = "https://docs.rs/uuid_to_pokemon"
 repository = "https://github.com/CleverCloud/uuid_to_pokemon.rs"
