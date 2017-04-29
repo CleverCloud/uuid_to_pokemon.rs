@@ -15,13 +15,19 @@ pub struct PokemonUuid<'a> {
 impl<'a> PokemonUuid<'a> {
     // Can't use FromStr
     // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
-    pub fn parse_str(s: &'a str) -> Result<PokemonUuid<'a>, &'static str> {
+    pub fn parse_str(s: &'a str) -> Result<Self, &'static str> {
         let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
         let (adj, pok) = s.split_at(mid);
         Ok(PokemonUuid {
             adj: adj,
             pok: &pok[1..],
         })
+    }
+}
+
+impl<'a> From<Uuid> for PokemonUuid<'a> {
+    fn from(uuid: Uuid) -> Self {
+        uuid_to_pokemon(uuid)
     }
 }
 
@@ -201,6 +207,14 @@ mod test {
     fn test_uuid_to_pokemon_nil() {
         let u = Uuid::nil();
         assert_eq!(Ok(uuid_to_pokemon(u)), PokemonUuid::parse_str("Busy bulbasaur"));
+    }
+
+    #[test]
+    fn test_from_uuid() {
+        for _ in 0..50 {
+            let u = Uuid::new_v4();
+            assert_eq!(uuid_to_pokemon(u), From::from(u));
+        }
     }
 
     #[test]
