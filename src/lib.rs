@@ -248,4 +248,12 @@ mod test {
             assert!(PokemonUuid::parse_str(n) != Ok(uuid_to_pokemon(u)));
         }
     }
+
+    #[test]
+    fn test_eq_incompatible_lifetimes() {
+        let n = "Busy bulbasaur".to_string();
+        let pid: PokemonUuid<'static> = Uuid::nil().into();
+        // the unwrap call is mandatory
+        assert!(pid == PokemonUuid::parse_str(&n).unwrap());
+    }
 }
