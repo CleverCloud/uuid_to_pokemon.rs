@@ -14,8 +14,8 @@ fn bench_eq(b: &mut Bencher) {
     let u = Uuid::nil();
     b.iter(|| {
         for _ in 0..100 {
-            black_box(uuid_to_pokemon(u) == PokemonUuid::parse_str("Busy bulbasaur").unwrap());
-            black_box(PokemonUuid::parse_str("Busy bulbasaur").unwrap() == uuid_to_pokemon(u));
+            black_box(Ok(uuid_to_pokemon(u)) == PokemonUuid::parse_str("Busy bulbasaur"));
+            black_box(PokemonUuid::parse_str("Busy bulbasaur") == Ok(uuid_to_pokemon(u)));
         }
     });
 }
@@ -25,8 +25,8 @@ fn bench_eq_rand(b: &mut Bencher) {
     b.iter(|| {
         let u = Uuid::new_v4();
         for _ in 0..100 {
-            black_box(uuid_to_pokemon(u) == PokemonUuid::parse_str("Busy bulbasaur").unwrap());
-            black_box(PokemonUuid::parse_str("Busy bulbasaur").unwrap() == uuid_to_pokemon(u));
+            black_box(Ok(uuid_to_pokemon(u)) == PokemonUuid::parse_str("Busy bulbasaur"));
+            black_box(PokemonUuid::parse_str("Busy bulbasaur") == Ok(uuid_to_pokemon(u)));
         }
     });
 }

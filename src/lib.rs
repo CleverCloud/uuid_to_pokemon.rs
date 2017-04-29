@@ -193,20 +193,20 @@ mod test {
         ];
 
         for (u, n) in ids.iter().zip(names.iter()) {
-            assert_eq!(uuid_to_pokemon(Uuid::parse_str(u).unwrap()), PokemonUuid::parse_str(n).unwrap());
+            assert_eq!(Ok(uuid_to_pokemon(Uuid::parse_str(u).unwrap())), PokemonUuid::parse_str(n));
         }
     }
 
     #[test]
     fn test_uuid_to_pokemon_nil() {
         let u = Uuid::nil();
-        assert_eq!(uuid_to_pokemon(u), PokemonUuid::parse_str("Busy bulbasaur").unwrap());
+        assert_eq!(Ok(uuid_to_pokemon(u)), PokemonUuid::parse_str("Busy bulbasaur"));
     }
 
     #[test]
     fn test_eq_str() {
         let u = Uuid::nil();
-        assert_eq!(PokemonUuid::parse_str("Busy bulbasaur").unwrap(), uuid_to_pokemon(u));
+        assert_eq!(PokemonUuid::parse_str("Busy bulbasaur"), Ok(uuid_to_pokemon(u)));
     }
 
     #[test]
@@ -215,12 +215,12 @@ mod test {
             "Busy bulbasau",
             "Busy bulbasaua",
             "busy bulbasaur",
-            // "Busybulbasaur",
+            "Busybulbasaur",
         ];
         let u = Uuid::nil();
         for n in items.iter() {
-            assert!(uuid_to_pokemon(u) != PokemonUuid::parse_str(n).unwrap());
-            assert!(PokemonUuid::parse_str(n).unwrap() != uuid_to_pokemon(u));
+            assert!(Ok(uuid_to_pokemon(u)) != PokemonUuid::parse_str(n));
+            assert!(PokemonUuid::parse_str(n) != Ok(uuid_to_pokemon(u)));
         }
     }
 }
