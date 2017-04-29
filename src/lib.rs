@@ -23,8 +23,8 @@ impl<'a> PokemonUuid<'a> {
     }
 }
 
-impl<'a> From<Uuid> for PokemonUuid<'a> {
-    fn from(uuid: Uuid) -> Self {
+impl From<Uuid> for PokemonUuid<'static> {
+    fn from(uuid: Uuid) -> PokemonUuid<'static> {
         uuid_to_pokemon(uuid)
     }
 }
