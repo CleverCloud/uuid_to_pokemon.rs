@@ -2,8 +2,41 @@ extern crate uuid;
 
 mod pokemons;
 
+use std::fmt;
 use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
+
+#[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
+pub struct PokemonUuid {
+    adj: &'static str,
+    pok: &'static str,
+}
+
+impl fmt::Display for PokemonUuid {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {}", self.adj, self.pok)
+    }
+}
+
+impl <'a> PartialEq<&'a str> for PokemonUuid {
+    fn eq(&self, other: &&'a str) -> bool {
+        let len = self.adj.len() + self.pok.len() + 1;
+        if len != other.len() {
+            return false;
+        }
+        self.adj.bytes()
+            .chain(" ".bytes())
+            .chain(self.pok.bytes())
+            .zip(other.bytes())
+            .all(|(s, o)| s == o)
+    }
+}
+
+impl <'a> PartialEq<PokemonUuid> for &'a str {
+    fn eq(&self, other: &PokemonUuid) -> bool {
+        PartialEq::eq(other, self)
+    }
+}
 
 fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
     let bs = uuid.as_bytes();
@@ -14,10 +47,13 @@ fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
         .sum()
 }
 
-pub fn uuid_to_pokemon(uuid: Uuid) -> String {
+pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid {
     let adj_index = get_digit_mult(uuid, 0) % ADJECTIVES.len();
     let pok_index = get_digit_mult(uuid, 8) % POKEMONS.len();
-    format!("{} {}", ADJECTIVES[adj_index], POKEMONS[pok_index])
+    PokemonUuid {
+        adj: ADJECTIVES[adj_index],
+        pok: POKEMONS[pok_index],
+    }
 }
 
 #[cfg(test)]
@@ -172,5 +208,26 @@ mod test {
     fn test_uuid_to_pokemon_nil() {
         let u = Uuid::nil();
         assert_eq!(uuid_to_pokemon(u), "Busy bulbasaur");
+    }
+
+    #[test]
+    fn test_eq_str() {
+        let u = Uuid::nil();
+        assert_eq!("Busy bulbasaur", uuid_to_pokemon(u));
+    }
+
+    #[test]
+    fn test_fail_eq_str() {
+        let items = &[
+            "Busy bulbasau",
+            "Busy bulbasaua",
+            "busy bulbasaur",
+            "Busybulbasaur",
+        ];
+        let u = Uuid::nil();
+        for n in items.iter() {
+            assert!(uuid_to_pokemon(u) != *n);
+            assert!(*n != uuid_to_pokemon(u));
+        }
     }
 }
