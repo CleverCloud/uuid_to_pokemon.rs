@@ -7,34 +7,27 @@ use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
-pub struct PokemonUuid {
-    adj: &'static str,
-    pok: &'static str,
+pub struct PokemonUuid<'a> {
+    adj: &'a str,
+    pok: &'a str,
 }
 
-impl fmt::Display for PokemonUuid {
+impl<'a> PokemonUuid<'a> {
+    // Can't use FromStr
+    // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
+    pub fn parse_str(s: &'a str) -> Result<PokemonUuid<'a>, &'static str> {
+        let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
+        let (adj, pok) = s.split_at(mid);
+        Ok(PokemonUuid {
+            adj: adj,
+            pok: &pok[1..],
+        })
+    }
+}
+
+impl<'a> fmt::Display for PokemonUuid<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} {}", self.adj, self.pok)
-    }
-}
-
-impl <'a> PartialEq<&'a str> for PokemonUuid {
-    fn eq(&self, other: &&'a str) -> bool {
-        let len = self.adj.len() + self.pok.len() + 1;
-        if len != other.len() {
-            return false;
-        }
-        self.adj.bytes()
-            .chain(" ".bytes())
-            .chain(self.pok.bytes())
-            .zip(other.bytes())
-            .all(|(s, o)| s == o)
-    }
-}
-
-impl <'a> PartialEq<PokemonUuid> for &'a str {
-    fn eq(&self, other: &PokemonUuid) -> bool {
-        PartialEq::eq(other, self)
     }
 }
 
@@ -47,7 +40,7 @@ fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
         .sum()
 }
 
-pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid {
+pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid<'static> {
     let adj_index = get_digit_mult(uuid, 0) % ADJECTIVES.len();
     let pok_index = get_digit_mult(uuid, 8) % POKEMONS.len();
     PokemonUuid {
@@ -200,20 +193,20 @@ mod test {
         ];
 
         for (u, n) in ids.iter().zip(names.iter()) {
-            assert_eq!(&uuid_to_pokemon(Uuid::parse_str(u).unwrap()), n);
+            assert_eq!(uuid_to_pokemon(Uuid::parse_str(u).unwrap()), PokemonUuid::parse_str(n).unwrap());
         }
     }
 
     #[test]
     fn test_uuid_to_pokemon_nil() {
         let u = Uuid::nil();
-        assert_eq!(uuid_to_pokemon(u), "Busy bulbasaur");
+        assert_eq!(uuid_to_pokemon(u), PokemonUuid::parse_str("Busy bulbasaur").unwrap());
     }
 
     #[test]
     fn test_eq_str() {
         let u = Uuid::nil();
-        assert_eq!("Busy bulbasaur", uuid_to_pokemon(u));
+        assert_eq!(PokemonUuid::parse_str("Busy bulbasaur").unwrap(), uuid_to_pokemon(u));
     }
 
     #[test]
@@ -222,12 +215,12 @@ mod test {
             "Busy bulbasau",
             "Busy bulbasaua",
             "busy bulbasaur",
-            "Busybulbasaur",
+            // "Busybulbasaur",
         ];
         let u = Uuid::nil();
         for n in items.iter() {
-            assert!(uuid_to_pokemon(u) != *n);
-            assert!(*n != uuid_to_pokemon(u));
+            assert!(uuid_to_pokemon(u) != PokemonUuid::parse_str(n).unwrap());
+            assert!(PokemonUuid::parse_str(n).unwrap() != uuid_to_pokemon(u));
         }
     }
 }
