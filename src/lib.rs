@@ -13,9 +13,7 @@ pub struct PokemonUuid<'a> {
 }
 
 impl<'a> PokemonUuid<'a> {
-    // Can't use FromStr
-    // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
-    pub fn parse_str(s: &'a str) -> Result<Self, &'static str> {
+    pub fn parse_str(s: &'a str) -> Result<PokemonUuid<'a>, &'static str> {
         let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
         let (adj, pok) = s.split_at(mid);
         Ok(PokemonUuid {
