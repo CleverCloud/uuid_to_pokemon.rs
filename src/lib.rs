@@ -31,12 +31,6 @@ impl From<Uuid> for PokemonUuid {
     }
 }
 
-impl Into<String> for PokemonUuid {
-    fn into(self) -> String {
-        format!("{}", self)
-    }
-}
-
 impl fmt::Display for PokemonUuid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} {}", self.adj, self.pok)
@@ -224,10 +218,9 @@ mod test {
     }
 
     #[test]
-    fn test_into_string() {
+    fn test_to_string() {
         let u = Uuid::nil();
-        let s : String = uuid_to_pokemon(u).into();
-        assert_eq!(s, "Busy bulbasaur".to_string());
+        assert_eq!(uuid_to_pokemon(u).to_string(), "Busy bulbasaur".to_string());
     }
 
     #[test]
