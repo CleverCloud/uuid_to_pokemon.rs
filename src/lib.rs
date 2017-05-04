@@ -224,12 +224,6 @@ mod test {
     }
 
     #[test]
-    fn test_eq_str() {
-        let u = Uuid::nil();
-        assert_eq!(PokemonUuid::parse_str("Busy bulbasaur"), Ok(uuid_to_pokemon(u)));
-    }
-
-    #[test]
     fn test_fail_eq_str() {
         let items = &[
             "Busy bulbasau",
