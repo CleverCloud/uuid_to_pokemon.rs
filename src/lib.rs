@@ -12,22 +12,18 @@ pub struct PokemonUuid {
     pok: &'static str,
 }
 
-impl PokemonUuid {
-    // Can't use FromStr
-    // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
-    pub fn parse_str(s: &'static str) -> Result<Self, &'static str> {
-        let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
-        let (adj, pok) = s.split_at(mid);
-        Ok(PokemonUuid {
-            adj: adj,
-            pok: &pok[1..],
-        })
+impl From<Uuid> for PokemonUuid {
+    fn from(uuid: Uuid) -> PokemonUuid {
+        uuid_to_pokemon(uuid)
     }
 }
 
-impl From<Uuid> for PokemonUuid {
-    fn from(uuid: Uuid) -> Self {
-        uuid_to_pokemon(uuid)
+impl From<(&'static str, &'static str)> for PokemonUuid {
+    fn from(v: (&'static str, &'static str)) -> PokemonUuid {
+        PokemonUuid {
+            adj: v.0,
+            pok: v.1,
+        }
     }
 }
 
@@ -146,67 +142,67 @@ mod test {
         ];
 
         let names = &[
-            "Amusing furret",
-            "Great mienshao",
-            "Sloppy pidgeotto",
-            "Endless skarmory",
-            "Strict gothitelle",
-            "Wonderful togetic",
-            "Shining lugia",
-            "Friendly wobbuffet",
-            "Hardworking magnemite",
-            "Glowing qwilfish",
-            "Slimy shedinja",
-            "Deep serperior",
-            "Splendid simisage",
-            "Starving sawsbuck",
-            "Beautiful mr-mime",
-            "Polite pidgey",
-            "Huge dedenne",
-            "Cranky floette-eternal",
-            "Stinky tyrogue",
-            "Truthful hypno",
-            "Truthful ralts",
-            "Dreadful mismagius",
-            "Loyal ninetales",
-            "Vast pawniard",
-            "Happy manectric-mega",
-            "Smelly jellicent",
-            "Wonderful ampharos-mega",
-            "Fussy exeggutor",
-            "Cheerful jumpluff",
-            "Amusing kyurem-black",
-            "Busy electivire",
-            "Truthful mantyke",
-            "Beautiful arceus",
-            "Tough poliwrath",
-            "Stiff nidorino",
-            "Loyal kirlia",
-            "Fussy greninja",
-            "Adorable swampert-mega",
-            "Truthful beheeyem",
-            "Sloppy kakuna",
-            "Spiky regigigas",
-            "Hard honchkrow",
-            "Dull oddish",
-            "Beautiful hydreigon",
-            "Clumsy absol-mega",
-            "Sizzling bergmite",
-            "Deep azurill",
-            "Cranky gurdurr",
-            "Foul corphish",
-            "Crazy shroomish",
+            ("Amusing", "furret"),
+            ("Great", "mienshao"),
+            ("Sloppy", "pidgeotto"),
+            ("Endless", "skarmory"),
+            ("Strict", "gothitelle"),
+            ("Wonderful", "togetic"),
+            ("Shining", "lugia"),
+            ("Friendly", "wobbuffet"),
+            ("Hardworking", "magnemite"),
+            ("Glowing", "qwilfish"),
+            ("Slimy", "shedinja"),
+            ("Deep", "serperior"),
+            ("Splendid", "simisage"),
+            ("Starving", "sawsbuck"),
+            ("Beautiful", "mr-mime"),
+            ("Polite", "pidgey"),
+            ("Huge", "dedenne"),
+            ("Cranky", "floette-eternal"),
+            ("Stinky", "tyrogue"),
+            ("Truthful", "hypno"),
+            ("Truthful", "ralts"),
+            ("Dreadful", "mismagius"),
+            ("Loyal", "ninetales"),
+            ("Vast", "pawniard"),
+            ("Happy", "manectric-mega"),
+            ("Smelly", "jellicent"),
+            ("Wonderful", "ampharos-mega"),
+            ("Fussy", "exeggutor"),
+            ("Cheerful", "jumpluff"),
+            ("Amusing", "kyurem-black"),
+            ("Busy", "electivire"),
+            ("Truthful", "mantyke"),
+            ("Beautiful", "arceus"),
+            ("Tough", "poliwrath"),
+            ("Stiff", "nidorino"),
+            ("Loyal", "kirlia"),
+            ("Fussy", "greninja"),
+            ("Adorable", "swampert-mega"),
+            ("Truthful", "beheeyem"),
+            ("Sloppy", "kakuna"),
+            ("Spiky", "regigigas"),
+            ("Hard", "honchkrow"),
+            ("Dull", "oddish"),
+            ("Beautiful", "hydreigon"),
+            ("Clumsy", "absol-mega"),
+            ("Sizzling", "bergmite"),
+            ("Deep", "azurill"),
+            ("Cranky", "gurdurr"),
+            ("Foul", "corphish"),
+            ("Crazy", "shroomish"),
         ];
 
-        for (u, n) in ids.iter().zip(names.iter()) {
-            assert_eq!(Ok(uuid_to_pokemon(Uuid::parse_str(u).unwrap())), PokemonUuid::parse_str(n));
+        for (u, n) in ids.iter().zip(names.iter().cloned()) {
+            assert_eq!(uuid_to_pokemon(Uuid::parse_str(u).unwrap()), n.into());
         }
     }
 
     #[test]
     fn test_uuid_to_pokemon_nil() {
         let u = Uuid::nil();
-        assert_eq!(Ok(uuid_to_pokemon(u)), PokemonUuid::parse_str("Busy bulbasaur"));
+        assert_eq!(uuid_to_pokemon(u), ("Busy", "bulbasaur").into());
     }
 
     #[test]
@@ -226,15 +222,14 @@ mod test {
     #[test]
     fn test_fail_eq_str() {
         let items = &[
-            "Busy bulbasau",
-            "Busy bulbasaua",
-            "busy bulbasaur",
-            "Busybulbasaur",
+            ("Busy", "bulbasau"),
+            ("Busy", "bulbasaua"),
+            ("busy", "bulbasaur"),
         ];
         let u = Uuid::nil();
-        for n in items.iter() {
-            assert!(Ok(uuid_to_pokemon(u)) != PokemonUuid::parse_str(n));
-            assert!(PokemonUuid::parse_str(n) != Ok(uuid_to_pokemon(u)));
+        for n in items.iter().cloned() {
+            assert!(uuid_to_pokemon(u) != n.into());
+            assert!(PokemonUuid::from(n) != uuid_to_pokemon(u));
         }
     }
 }
