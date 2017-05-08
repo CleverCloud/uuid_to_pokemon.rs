@@ -1,3 +1,37 @@
+//! This simple crate allows you to translate a *UUID* to a pokémon name. The purpose is to provide
+//! simple names to address objects, so you can easily talk with people about the objects.
+//!
+//! The function is not injective. This means several *UUID*s will give the same name. We don't
+//! consider it an issue since context (like owner of object) will help dedup the search.
+//!
+//! ## Examples
+//! ```rust
+//! extern crate uuid;
+//! extern crate uuid_to_pokemon;
+//!
+//! use uuid::Uuid;
+//! use uuid_to_pokemon::uuid_to_pokemon;
+//! use std::fmt::Write; // needed for write!
+//!
+//! fn main() {
+//!     let my_uuid = Uuid::nil();
+//!     let result = uuid_to_pokemon(my_uuid);
+//!
+//!     // format it:
+//!     let s = format!("`{}` as pokemon: `{}`", my_uuid, result);
+//!     assert_eq!(s, "`00000000-0000-0000-0000-000000000000` as pokemon: `Busy bulbasaur`");
+//!
+//!     // write it into an existing String:
+//!     let mut s = "foo bar - ".to_string();
+//!     write!(s, "pokemon: `{}`", result).unwrap();
+//!     assert_eq!(s, "foo bar - pokemon: `Busy bulbasaur`");
+//!
+//!     // if you need a simple String, use the to_string function:
+//!     let s = result.to_string();
+//!     assert_eq!(s, "Busy bulbasaur");
+//! }
+//! ```
+
 extern crate uuid;
 
 mod pokemons;
@@ -6,6 +40,7 @@ use std::fmt;
 use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
 
+/// Represents the result of [uuid_to_pokemon](fn.uuid_to_pokemon.html).
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct PokemonUuid {
     adj: &'static str,
@@ -33,6 +68,7 @@ fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
         .sum()
 }
 
+/// Converts an *Uuid* into a *PokemonUuid*.
 pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid {
     let adj_index = get_digit_mult(uuid, 0) % ADJECTIVES.len();
     let pok_index = get_digit_mult(uuid, 8) % POKEMONS.len();
