@@ -1,3 +1,33 @@
+//! This simple crate allows you to translate a *UUID* to a pokémon name. The purpose is to provide
+//! simple names to address objects, so you can easily talk with people about the objects.
+//!
+//! The function is not injective. This means several *UUID*s will give the same name. We don't
+//! consider it an issue since context (like owner of object) will help dedup the search.
+//!
+//! ## Examples
+//! ```rust
+//! extern crate uuid;
+//! extern crate uuid_to_pokemon;
+//!
+//! use uuid::Uuid;
+//! use uuid_to_pokemon::{uuid_to_pokemon, PokemonUuid};
+//! use std::fmt::Write;
+//!
+//! fn main() {
+//!     let my_uuid: Uuid = Uuid::nil();
+//!     let result: PokemonUuid = uuid_to_pokemon(my_uuid);
+//!
+//!    // write it into a string:
+//!    let mut s = String::new();
+//!    write!(s, "uuid `{}` as pokemon: `{}`", my_uuid, result).unwrap();
+//!    assert_eq!(s, "uuid `00000000-0000-0000-0000-000000000000` as pokemon: `Busy bulbasaur`");
+//!
+//!    // if you need a simple String, use the to_string function:
+//!    let s = result.to_string();
+//!    assert_eq!(s, "Busy bulbasaur");
+//! }
+//! ```
+
 extern crate uuid;
 
 mod pokemons;
@@ -6,28 +36,29 @@ use std::fmt;
 use uuid::Uuid;
 use pokemons::{POKEMONS, ADJECTIVES};
 
+
+/// Represents the result of [uuid_to_pokemon](fn.uuid_to_pokemon.html). It is a small wrapper
+/// allowing us to operate without allocations.
+///
+/// For examples see the [module doc](index.html)
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct PokemonUuid {
     adj: &'static str,
     pok: &'static str,
 }
 
-impl PokemonUuid {
-    // Can't use FromStr
-    // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
-    pub fn parse_str(s: &'static str) -> Result<Self, &'static str> {
-        let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
-        let (adj, pok) = s.split_at(mid);
-        Ok(PokemonUuid {
-            adj: adj,
-            pok: &pok[1..],
-        })
+impl From<Uuid> for PokemonUuid {
+    fn from(uuid: Uuid) -> PokemonUuid {
+        uuid_to_pokemon(uuid)
     }
 }
 
-impl From<Uuid> for PokemonUuid {
-    fn from(uuid: Uuid) -> Self {
-        uuid_to_pokemon(uuid)
+impl From<(&'static str, &'static str)> for PokemonUuid {
+    fn from(v: (&'static str, &'static str)) -> PokemonUuid {
+        PokemonUuid {
+            adj: v.0,
+            pok: v.1,
+        }
     }
 }
 
@@ -46,6 +77,9 @@ fn get_digit_mult(uuid: Uuid, first_index: usize) -> usize {
         .sum()
 }
 
+/// Converts an *Uuid* into a *PokemonUuid*.
+///
+/// For examples see the [module doc](index.html)
 pub fn uuid_to_pokemon(uuid: Uuid) -> PokemonUuid {
     let adj_index = get_digit_mult(uuid, 0) % ADJECTIVES.len();
     let pok_index = get_digit_mult(uuid, 8) % POKEMONS.len();
@@ -146,67 +180,67 @@ mod test {
         ];
 
         let names = &[
-            "Amusing furret",
-            "Great mienshao",
-            "Sloppy pidgeotto",
-            "Endless skarmory",
-            "Strict gothitelle",
-            "Wonderful togetic",
-            "Shining lugia",
-            "Friendly wobbuffet",
-            "Hardworking magnemite",
-            "Glowing qwilfish",
-            "Slimy shedinja",
-            "Deep serperior",
-            "Splendid simisage",
-            "Starving sawsbuck",
-            "Beautiful mr-mime",
-            "Polite pidgey",
-            "Huge dedenne",
-            "Cranky floette-eternal",
-            "Stinky tyrogue",
-            "Truthful hypno",
-            "Truthful ralts",
-            "Dreadful mismagius",
-            "Loyal ninetales",
-            "Vast pawniard",
-            "Happy manectric-mega",
-            "Smelly jellicent",
-            "Wonderful ampharos-mega",
-            "Fussy exeggutor",
-            "Cheerful jumpluff",
-            "Amusing kyurem-black",
-            "Busy electivire",
-            "Truthful mantyke",
-            "Beautiful arceus",
-            "Tough poliwrath",
-            "Stiff nidorino",
-            "Loyal kirlia",
-            "Fussy greninja",
-            "Adorable swampert-mega",
-            "Truthful beheeyem",
-            "Sloppy kakuna",
-            "Spiky regigigas",
-            "Hard honchkrow",
-            "Dull oddish",
-            "Beautiful hydreigon",
-            "Clumsy absol-mega",
-            "Sizzling bergmite",
-            "Deep azurill",
-            "Cranky gurdurr",
-            "Foul corphish",
-            "Crazy shroomish",
+            ("Amusing", "furret"),
+            ("Great", "mienshao"),
+            ("Sloppy", "pidgeotto"),
+            ("Endless", "skarmory"),
+            ("Strict", "gothitelle"),
+            ("Wonderful", "togetic"),
+            ("Shining", "lugia"),
+            ("Friendly", "wobbuffet"),
+            ("Hardworking", "magnemite"),
+            ("Glowing", "qwilfish"),
+            ("Slimy", "shedinja"),
+            ("Deep", "serperior"),
+            ("Splendid", "simisage"),
+            ("Starving", "sawsbuck"),
+            ("Beautiful", "mr-mime"),
+            ("Polite", "pidgey"),
+            ("Huge", "dedenne"),
+            ("Cranky", "floette-eternal"),
+            ("Stinky", "tyrogue"),
+            ("Truthful", "hypno"),
+            ("Truthful", "ralts"),
+            ("Dreadful", "mismagius"),
+            ("Loyal", "ninetales"),
+            ("Vast", "pawniard"),
+            ("Happy", "manectric-mega"),
+            ("Smelly", "jellicent"),
+            ("Wonderful", "ampharos-mega"),
+            ("Fussy", "exeggutor"),
+            ("Cheerful", "jumpluff"),
+            ("Amusing", "kyurem-black"),
+            ("Busy", "electivire"),
+            ("Truthful", "mantyke"),
+            ("Beautiful", "arceus"),
+            ("Tough", "poliwrath"),
+            ("Stiff", "nidorino"),
+            ("Loyal", "kirlia"),
+            ("Fussy", "greninja"),
+            ("Adorable", "swampert-mega"),
+            ("Truthful", "beheeyem"),
+            ("Sloppy", "kakuna"),
+            ("Spiky", "regigigas"),
+            ("Hard", "honchkrow"),
+            ("Dull", "oddish"),
+            ("Beautiful", "hydreigon"),
+            ("Clumsy", "absol-mega"),
+            ("Sizzling", "bergmite"),
+            ("Deep", "azurill"),
+            ("Cranky", "gurdurr"),
+            ("Foul", "corphish"),
+            ("Crazy", "shroomish"),
         ];
 
-        for (u, n) in ids.iter().zip(names.iter()) {
-            assert_eq!(Ok(uuid_to_pokemon(Uuid::parse_str(u).unwrap())), PokemonUuid::parse_str(n));
+        for (u, n) in ids.iter().zip(names.iter().cloned()) {
+            assert_eq!(uuid_to_pokemon(Uuid::parse_str(u).unwrap()), n.into());
         }
     }
 
     #[test]
     fn test_uuid_to_pokemon_nil() {
         let u = Uuid::nil();
-        assert_eq!(Ok(uuid_to_pokemon(u)), PokemonUuid::parse_str("Busy bulbasaur"));
+        assert_eq!(uuid_to_pokemon(u), ("Busy", "bulbasaur").into());
     }
 
     #[test]
@@ -224,23 +258,16 @@ mod test {
     }
 
     #[test]
-    fn test_eq_str() {
-        let u = Uuid::nil();
-        assert_eq!(PokemonUuid::parse_str("Busy bulbasaur"), Ok(uuid_to_pokemon(u)));
-    }
-
-    #[test]
     fn test_fail_eq_str() {
         let items = &[
-            "Busy bulbasau",
-            "Busy bulbasaua",
-            "busy bulbasaur",
-            "Busybulbasaur",
+            ("Busy", "bulbasau"),
+            ("Busy", "bulbasaua"),
+            ("busy", "bulbasaur"),
         ];
         let u = Uuid::nil();
-        for n in items.iter() {
-            assert!(Ok(uuid_to_pokemon(u)) != PokemonUuid::parse_str(n));
-            assert!(PokemonUuid::parse_str(n) != Ok(uuid_to_pokemon(u)));
+        for n in items.iter().cloned() {
+            assert!(uuid_to_pokemon(u) != n.into());
+            assert!(PokemonUuid::from(n) != uuid_to_pokemon(u));
         }
     }
 }
