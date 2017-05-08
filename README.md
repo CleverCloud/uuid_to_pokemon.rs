@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/CleverCloud/uuid_to_pokemon.rs.svg?branch=master)](https://travis-ci.org/CleverCloud/uuid_to_pokemon.rs)
 [![Build status](https://ci.appveyor.com/api/projects/status/wkquvy5qw2sy3lmc?svg=true)](https://ci.appveyor.com/project/Keruspe/uuid-to-pokemon-rs)
 [![Coverage Status](https://coveralls.io/repos/github/CleverCloud/uuid_to_pokemon.rs/badge.svg?branch=master)](https://coveralls.io/github/CleverCloud/uuid_to_pokemon.rs?branch=master)
+[Documentation](https://docs.rs/uuid_to_pokemon)
 
 This simple crate allows you to translate a UUID to a pokémon name.
 
