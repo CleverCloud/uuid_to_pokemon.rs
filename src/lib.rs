@@ -12,19 +12,6 @@ pub struct PokemonUuid {
     pok: &'static str,
 }
 
-impl PokemonUuid {
-    // Can't use FromStr
-    // https://stackoverflow.com/questions/28931515/how-do-i-implement-fromstr-with-a-concrete-lifetime
-    pub fn parse_str(s: &'static str) -> Result<Self, &'static str> {
-        let mid = s.find(" ").ok_or("Can not convert string into PokemonUuid")?;
-        let (adj, pok) = s.split_at(mid);
-        Ok(PokemonUuid {
-            adj: adj,
-            pok: &pok[1..],
-        })
-    }
-}
-
 impl From<Uuid> for PokemonUuid {
     fn from(uuid: Uuid) -> Self {
         uuid_to_pokemon(uuid)
