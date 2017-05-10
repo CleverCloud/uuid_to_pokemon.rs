@@ -199,14 +199,8 @@ mod test {
         ];
 
         for (u, n) in ids.iter().zip(names.iter()) {
-            assert_eq!(Ok(uuid_to_pokemon(Uuid::parse_str(u).unwrap())), PokemonUuid::parse_str(n));
+            assert_eq!(uuid_to_pokemon(Uuid::parse_str(u).unwrap()).to_string(), *n);
         }
-    }
-
-    #[test]
-    fn test_uuid_to_pokemon_nil() {
-        let u = Uuid::nil();
-        assert_eq!(Ok(uuid_to_pokemon(u)), PokemonUuid::parse_str("Busy bulbasaur"));
     }
 
     #[test]
@@ -218,19 +212,14 @@ mod test {
     }
 
     #[test]
-    fn test_to_string() {
-        let u = Uuid::nil();
-        assert_eq!(uuid_to_pokemon(u).to_string(), "Busy bulbasaur".to_string());
-    }
-
-    #[test]
     fn test_eq_str() {
         let u = Uuid::nil();
-        assert_eq!(PokemonUuid::parse_str("Busy bulbasaur"), Ok(uuid_to_pokemon(u)));
+        assert_eq!("Busy bulbasaur", uuid_to_pokemon(u).to_string());
+        assert_eq!(uuid_to_pokemon(u).to_string(), "Busy bulbasaur");
     }
 
     #[test]
-    fn test_fail_eq_str() {
+    fn test_ne_str() {
         let items = &[
             "Busy bulbasau",
             "Busy bulbasaua",
@@ -239,8 +228,8 @@ mod test {
         ];
         let u = Uuid::nil();
         for n in items.iter() {
-            assert!(Ok(uuid_to_pokemon(u)) != PokemonUuid::parse_str(n));
-            assert!(PokemonUuid::parse_str(n) != Ok(uuid_to_pokemon(u)));
+            assert_ne!(uuid_to_pokemon(u).to_string(), *n);
+            assert_ne!(*n, uuid_to_pokemon(u).to_string());
         }
     }
 }
