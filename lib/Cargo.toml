@@ -1,0 +1,18 @@
+[package]
+name = "uuid_to_pokemon"
+version = "0.2.0"
+authors = ["Julien Durillon <julien.durillon@clever-cloud.com"]
+documentation = "https://docs.rs/uuid_to_pokemon"
+repository = "https://github.com/CleverCloud/uuid_to_pokemon.rs"
+description = "Translates a UUID to a qualified pokemon name."
+license = "MIT"
+
+[dependencies]
+uuid = "0.5"
+
+[dev-dependencies]
+uuid = {version = "0.5", features = ["v4"]}
+
+[badges]
+travis-ci = { repository = "CleverCloud/uuid_to_pokemon.rs" }
+appveyor  = { repository = "Keruspe/uuid_to_pokemon.rs" }
