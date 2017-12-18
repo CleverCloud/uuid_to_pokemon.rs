@@ -6,3 +6,5 @@ authors = ["Clement Delafargue <clement@delafargue.name>"]
 [dependencies]
 uuid_to_pokemon = { version = "^0.2", path = "../lib" }
 uuid = { version = "0.5", features = ["v4"] }
+structopt = "0.1.6"
+structopt-derive = "0.1.6"

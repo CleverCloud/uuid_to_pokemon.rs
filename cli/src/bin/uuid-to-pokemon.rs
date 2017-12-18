@@ -1,33 +1,28 @@
 extern crate uuid;
 extern crate uuid_to_pokemon;
+extern crate structopt;
+#[macro_use]
+extern crate structopt_derive;
 
-use std::{env, process};
 use uuid::Uuid;
 use uuid_to_pokemon::uuid_to_pokemon;
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+#[structopt(name = "UUID to POKEMON")]
+struct Opt {
+    #[structopt(help = "List of UUIDs")]
+    uuids: Vec<Uuid>,
+}
 
 fn main() {
-    let mut uuids: Vec<Uuid> = vec![];
-    let mut errors: Vec<String> = vec![];
+    let mut opt = Opt::from_args();
 
-    for arg in env::args().skip(1) {
-        match Uuid::parse_str(&arg) {
-            Ok(u) => uuids.push(u),
-            Err(_) => errors.push(arg),
-        }
+    if opt.uuids.len() == 0 {
+        opt.uuids.push(Uuid::new_v4());
     }
 
-    if uuids.len() == 0 && errors.len() == 0 {
-        uuids.push(Uuid::new_v4());
-    }
-
-    if errors.len() > 0 {
-        for e in errors {
-            eprintln!("{} is not a valid UUID", e);
-        }
-        process::exit(1);
-    }
-
-    for u in uuids {
+    for u in opt.uuids {
         println!("{}\t{}", u, uuid_to_pokemon(u));
     }
 }
