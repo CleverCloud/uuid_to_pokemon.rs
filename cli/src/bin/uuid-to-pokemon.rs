@@ -1,7 +1,6 @@
 extern crate uuid;
 extern crate uuid_to_pokemon;
 extern crate structopt;
-#[macro_use]
 extern crate structopt_derive;
 
 use uuid::Uuid;
