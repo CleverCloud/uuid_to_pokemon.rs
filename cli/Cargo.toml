@@ -1,10 +1,10 @@
 [package]
 name = "uuid_to_pokemon_cli"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Clement Delafargue <clement@delafargue.name>"]
 
 [dependencies]
 uuid_to_pokemon = { version = "^0.3", path = "../lib" }
-uuid = { version = "0.7", features = ["v4"] }
+uuid = { version = "^0.8", features = ["v4"] }
 structopt = "0.2"
 structopt-derive = "0.2"
